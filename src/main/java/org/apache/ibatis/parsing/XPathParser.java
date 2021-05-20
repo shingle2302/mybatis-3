@@ -124,6 +124,7 @@ public class XPathParser {
 
   public XPathParser(InputStream inputStream, boolean validation, Properties variables, EntityResolver entityResolver) {
     commonConstructor(validation, variables, entityResolver);
+    //用输入流创建xml document对象
     this.document = createDocument(new InputSource(inputStream));
   }
 
@@ -268,6 +269,7 @@ public class XPathParser {
     this.validation = validation;
     this.entityResolver = entityResolver;
     this.variables = variables;
+    //创建XPathFactory
     XPathFactory factory = XPathFactory.newInstance();
     this.xpath = factory.newXPath();
   }

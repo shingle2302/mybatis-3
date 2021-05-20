@@ -61,6 +61,7 @@ public class SqlSessionFactoryBuilder {
   }
 
   public SqlSessionFactory build(InputStream inputStream) {
+    //根据配置文件调用重载方法创建SqlSessionFactory
     return build(inputStream, null, null);
   }
 
@@ -74,7 +75,9 @@ public class SqlSessionFactoryBuilder {
 
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      //创建XML配置生成器对象
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+      //用XML配置生成器创建SqlSessionFactory
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
@@ -88,6 +91,9 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+  /**
+   * 根据配置创建默认SqlSessionFactory
+   */
   public SqlSessionFactory build(Configuration config) {
     return new DefaultSqlSessionFactory(config);
   }
