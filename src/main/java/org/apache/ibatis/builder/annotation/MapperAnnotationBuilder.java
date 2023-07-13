@@ -114,21 +114,26 @@ public class MapperAnnotationBuilder {
 
   public void parse() {
     String resource = type.toString();
+    //避免重复加载
     if (!configuration.isResourceLoaded(resource)) {
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
+      //解析二级缓存
       parseCache();
       parseCacheRef();
       for (Method method : type.getMethods()) {
         if (!canHaveStatement(method)) {
           continue;
         }
+        //如果方法上有Select,SelectProvider注解，但是没有ResultMap注解
         if (getAnnotationWrapper(method, false, Select.class, SelectProvider.class).isPresent()
             && method.getAnnotation(ResultMap.class) == null) {
+          //解析带Result注解的方法
           parseResultMap(method);
         }
         try {
+          //解析带注解Select, Update, Insert, Delete的方法
           parseStatement(method);
         } catch (IncompleteElementException e) {
           configuration.addIncompleteMethod(new MethodResolver(this, method));
@@ -362,6 +367,7 @@ public class MapperAnnotationBuilder {
         }
       }
 
+      //mapper创建助手新建MappedStatement对象
       assistant.addMappedStatement(mappedStatementId, sqlSource, statementType, sqlCommandType, fetchSize, timeout,
           // ParameterMapID
           null, parameterTypeClass, resultMapId, getReturnType(method, type), resultSetType, flushCache, useCache,

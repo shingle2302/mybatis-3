@@ -63,6 +63,7 @@ public class XMLStatementBuilder extends BaseBuilder {
       return;
     }
 
+    //从context获取各种属性创建MappedStatement
     String nodeName = context.getNode().getNodeName();
     SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;

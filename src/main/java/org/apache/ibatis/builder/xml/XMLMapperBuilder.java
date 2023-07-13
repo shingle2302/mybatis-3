@@ -82,6 +82,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource,
       Map<String, XNode> sqlFragments) {
+    //调用重载方法，同时新建MapperBuilderAssistant
     this(new XPathParser(inputStream, true, configuration.getVariables(), new XMLMapperEntityResolver()), configuration,
         resource, sqlFragments);
   }
@@ -97,13 +98,15 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   public void parse() {
     if (!configuration.isResourceLoaded(resource)) {
+      //解析Mapper
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
       bindMapperForNamespace();
     }
-
+    //解析待处理ResultMaps
     parsePendingResultMaps();
     parsePendingCacheRefs();
+    //解析待处理Statements
     parsePendingStatements();
   }
 
@@ -118,11 +121,17 @@ public class XMLMapperBuilder extends BaseBuilder {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
       builderAssistant.setCurrentNamespace(namespace);
+      //解析cache引用
       cacheRefElement(context.evalNode("cache-ref"));
+      //解析cache
       cacheElement(context.evalNode("cache"));
+      //解析parameterMap
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      //解析resultMap
       resultMapElements(context.evalNodes("/mapper/resultMap"));
+      //解析sql片段
       sqlElement(context.evalNodes("/mapper/sql"));
+      //使用XMLStatementBuilder创建Statement
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -141,6 +150,7 @@ public class XMLMapperBuilder extends BaseBuilder {
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context,
           requiredDatabaseId);
       try {
+        //解析StatementNode
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteStatement(statementParser);
